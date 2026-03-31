@@ -83,3 +83,58 @@ resource "azurerm_storage_container" "data" {
   storage_account_id    = azurerm_storage_account.this.id
   container_access_type = "private"
 }
+
+resource "azurerm_public_ip" "vm" {
+  name                = "pip-vm-${local.name_prefix}"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.this.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+
+  tags = local.common_tags
+}
+
+resource "azurerm_network_interface" "vm" {
+  name                = "nic-vm-${local.name_prefix}"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.this.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = module.vnet.subnet_ids["snet-app"]
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.vm.id
+  }
+
+  tags = local.common_tags
+}
+
+resource "azurerm_linux_virtual_machine" "this" {
+  name                            = "vm-${local.name_prefix}"
+  location                        = var.location
+  resource_group_name             = azurerm_resource_group.this.name
+  size                            = var.vm_size
+  admin_username                  = var.vm_admin_username
+  disable_password_authentication = true
+  network_interface_ids           = [azurerm_network_interface.vm.id]
+
+  admin_ssh_key {
+    username   = var.vm_admin_username
+    public_key = var.vm_ssh_public_key
+  }
+
+  os_disk {
+    name                 = "osdisk-vm-${local.name_prefix}"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts-gen2"
+    version   = "latest"
+  }
+
+  tags = local.common_tags
+}

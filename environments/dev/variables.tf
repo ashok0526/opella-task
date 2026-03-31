@@ -41,3 +41,21 @@ variable "subnets" {
     }
   }
 }
+
+variable "vm_size" {
+  description = "Size of the virtual machine"
+  type        = string
+  default     = "Standard_B1s"
+}
+
+variable "vm_admin_username" {
+  description = "Admin username for the virtual machine"
+  type        = string
+  default     = "azureadmin"
+}
+
+variable "vm_ssh_public_key" {
+  description = "SSH public key for VM authentication"
+  type        = string
+  sensitive   = true
+}

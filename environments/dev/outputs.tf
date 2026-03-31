@@ -32,3 +32,18 @@ output "storage_account_id" {
   description = "ID of the storage account"
   value       = azurerm_storage_account.this.id
 }
+
+output "vm_name" {
+  description = "Name of the virtual machine"
+  value       = azurerm_linux_virtual_machine.this.name
+}
+
+output "vm_public_ip" {
+  description = "Public IP address of the virtual machine"
+  value       = azurerm_public_ip.vm.ip_address
+}
+
+output "vm_private_ip" {
+  description = "Private IP address of the virtual machine"
+  value       = azurerm_network_interface.vm.private_ip_address
+}
