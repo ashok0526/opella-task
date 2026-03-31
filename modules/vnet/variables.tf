@@ -52,12 +52,6 @@ variable "nsg_rules" {
   default = {}
 }
 
-variable "enable_ddos_protection" {
-  description = "Enable Azure DDoS Protection Plan for the VNET"
-  type        = bool
-  default     = false
-}
-
 variable "tags" {
   description = "Tags to apply to all resources created by this module"
   type        = map(string)

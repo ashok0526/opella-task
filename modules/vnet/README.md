@@ -70,7 +70,6 @@ module "vnet" {
 | dns_servers              | Custom DNS servers (empty = Azure default)               | `list(string)`      | `[]`           | no       |
 | subnets                  | Map of subnet configurations                             | `map(object({...}))` | `{}`          | no       |
 | nsg_rules                | Map of NSG rules per subnet                              | `map(list(object))` | `{}`           | no       |
-| enable_ddos_protection   | Enable DDoS Protection Plan                              | `bool`              | `false`        | no       |
 | tags                     | Tags to apply to all resources                           | `map(string)`       | `{}`           | no       |
 
 ## Outputs

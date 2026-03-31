@@ -1,0 +1,287 @@
+$ terraform plan -var="subscription_id=a3e42f81-77b2-4d05-a8c9-6f3b1e8d24a7" -var="vm_ssh_public_key=$(cat ~/.ssh/id_rsa.pub)"
+
+Terraform used the selected providers to generate the following execution plan.
+Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # azurerm_resource_group.this will be created
+  + resource "azurerm_resource_group" "this" {
+      + id       = (known after apply)
+      + location = "eastus"
+      + name     = "rg-opella-dev-eastus"
+      + tags     = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Project"     = "opella"
+          + "Region"      = "eastus"
+        }
+    }
+
+  # module.vnet.azurerm_virtual_network.this will be created
+  + resource "azurerm_virtual_network" "this" {
+      + address_space       = [
+          + "10.0.0.0/16",
+        ]
+      + id                  = (known after apply)
+      + location            = "eastus"
+      + name                = "vnet-opella-dev-eastus"
+      + resource_group_name = "rg-opella-dev-eastus"
+      + tags                = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Project"     = "opella"
+          + "Region"      = "eastus"
+        }
+    }
+
+  # module.vnet.azurerm_subnet.this["snet-app"] will be created
+  + resource "azurerm_subnet" "this" {
+      + address_prefixes                              = [
+          + "10.0.1.0/24",
+        ]
+      + id                                            = (known after apply)
+      + name                                          = "snet-app"
+      + private_endpoint_network_policies             = "Enabled"
+      + private_link_service_network_policies_enabled = false
+      + resource_group_name                           = "rg-opella-dev-eastus"
+      + service_endpoints                             = [
+          + "Microsoft.Storage",
+        ]
+      + virtual_network_name                          = "vnet-opella-dev-eastus"
+    }
+
+  # module.vnet.azurerm_subnet.this["snet-data"] will be created
+  + resource "azurerm_subnet" "this" {
+      + address_prefixes                              = [
+          + "10.0.2.0/24",
+        ]
+      + id                                            = (known after apply)
+      + name                                          = "snet-data"
+      + private_endpoint_network_policies             = "Enabled"
+      + private_link_service_network_policies_enabled = false
+      + resource_group_name                           = "rg-opella-dev-eastus"
+      + service_endpoints                             = [
+          + "Microsoft.Storage",
+        ]
+      + virtual_network_name                          = "vnet-opella-dev-eastus"
+    }
+
+  # module.vnet.azurerm_network_security_group.this["snet-app"] will be created
+  + resource "azurerm_network_security_group" "this" {
+      + id                  = (known after apply)
+      + location            = "eastus"
+      + name                = "nsg-snet-app"
+      + resource_group_name = "rg-opella-dev-eastus"
+      + tags                = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Project"     = "opella"
+          + "Region"      = "eastus"
+        }
+    }
+
+  # module.vnet.azurerm_network_security_rule.this["snet-app-allow-http-inbound"] will be created
+  + resource "azurerm_network_security_rule" "this" {
+      + access                      = "Allow"
+      + destination_address_prefix  = "*"
+      + destination_port_range      = "80"
+      + direction                   = "Inbound"
+      + id                          = (known after apply)
+      + name                        = "allow-http-inbound"
+      + network_security_group_name = "nsg-snet-app"
+      + priority                    = 100
+      + protocol                    = "Tcp"
+      + resource_group_name         = "rg-opella-dev-eastus"
+      + source_address_prefix       = "*"
+      + source_port_range           = "*"
+    }
+
+  # module.vnet.azurerm_network_security_rule.this["snet-app-allow-https-inbound"] will be created
+  + resource "azurerm_network_security_rule" "this" {
+      + access                      = "Allow"
+      + destination_address_prefix  = "*"
+      + destination_port_range      = "443"
+      + direction                   = "Inbound"
+      + id                          = (known after apply)
+      + name                        = "allow-https-inbound"
+      + network_security_group_name = "nsg-snet-app"
+      + priority                    = 110
+      + protocol                    = "Tcp"
+      + resource_group_name         = "rg-opella-dev-eastus"
+      + source_address_prefix       = "*"
+      + source_port_range           = "*"
+    }
+
+  # module.vnet.azurerm_network_security_rule.this["snet-app-allow-ssh-inbound"] will be created
+  + resource "azurerm_network_security_rule" "this" {
+      + access                      = "Allow"
+      + destination_address_prefix  = "*"
+      + destination_port_range      = "22"
+      + direction                   = "Inbound"
+      + id                          = (known after apply)
+      + name                        = "allow-ssh-inbound"
+      + network_security_group_name = "nsg-snet-app"
+      + priority                    = 120
+      + protocol                    = "Tcp"
+      + resource_group_name         = "rg-opella-dev-eastus"
+      + source_address_prefix       = "*"
+      + source_port_range           = "*"
+    }
+
+  # module.vnet.azurerm_network_security_rule.this["snet-app-deny-all-inbound"] will be created
+  + resource "azurerm_network_security_rule" "this" {
+      + access                      = "Deny"
+      + destination_address_prefix  = "*"
+      + destination_port_range      = "*"
+      + direction                   = "Inbound"
+      + id                          = (known after apply)
+      + name                        = "deny-all-inbound"
+      + network_security_group_name = "nsg-snet-app"
+      + priority                    = 4096
+      + protocol                    = "*"
+      + resource_group_name         = "rg-opella-dev-eastus"
+      + source_address_prefix       = "*"
+      + source_port_range           = "*"
+    }
+
+  # module.vnet.azurerm_subnet_network_security_group_association.this["snet-app"] will be created
+  + resource "azurerm_subnet_network_security_group_association" "this" {
+      + id                        = (known after apply)
+      + network_security_group_id = (known after apply)
+      + subnet_id                 = (known after apply)
+    }
+
+  # azurerm_storage_account.this will be created
+  + resource "azurerm_storage_account" "this" {
+      + access_tier                       = (known after apply)
+      + account_replication_type          = "LRS"
+      + account_tier                      = "Standard"
+      + allow_nested_items_to_be_public   = (known after apply)
+      + id                               = (known after apply)
+      + location                         = "eastus"
+      + min_tls_version                  = "TLS1_2"
+      + name                             = "stopelladeveastus"
+      + primary_blob_endpoint            = (known after apply)
+      + primary_connection_string        = (sensitive value)
+      + resource_group_name              = "rg-opella-dev-eastus"
+      + tags                             = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Project"     = "opella"
+          + "Region"      = "eastus"
+        }
+
+      + blob_properties {
+          + versioning_enabled = true
+
+          + delete_retention_policy {
+              + days = 7
+            }
+        }
+
+      + network_rules {
+          + bypass                     = [
+              + "AzureServices",
+            ]
+          + default_action             = "Deny"
+          + virtual_network_subnet_ids = (known after apply)
+        }
+    }
+
+  # azurerm_storage_container.data will be created
+  + resource "azurerm_storage_container" "data" {
+      + container_access_type = "private"
+      + id                    = (known after apply)
+      + name                  = "data"
+      + storage_account_id    = (known after apply)
+    }
+
+  # azurerm_public_ip.vm will be created
+  + resource "azurerm_public_ip" "vm" {
+      + allocation_method   = "Static"
+      + id                  = (known after apply)
+      + ip_address          = (known after apply)
+      + location            = "eastus"
+      + name                = "pip-vm-opella-dev-eastus"
+      + resource_group_name = "rg-opella-dev-eastus"
+      + sku                 = "Standard"
+      + tags                = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Project"     = "opella"
+          + "Region"      = "eastus"
+        }
+    }
+
+  # azurerm_network_interface.vm will be created
+  + resource "azurerm_network_interface" "vm" {
+      + id                  = (known after apply)
+      + location            = "eastus"
+      + name                = "nic-vm-opella-dev-eastus"
+      + resource_group_name = "rg-opella-dev-eastus"
+      + tags                = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Project"     = "opella"
+          + "Region"      = "eastus"
+        }
+
+      + ip_configuration {
+          + name                          = "internal"
+          + private_ip_address_allocation = "Dynamic"
+          + public_ip_address_id          = (known after apply)
+          + subnet_id                     = (known after apply)
+        }
+    }
+
+  # azurerm_linux_virtual_machine.this will be created
+  + resource "azurerm_linux_virtual_machine" "this" {
+      + admin_username                  = "azureadmin"
+      + disable_password_authentication = true
+      + id                              = (known after apply)
+      + location                        = "eastus"
+      + name                            = "vm-opella-dev-eastus"
+      + network_interface_ids           = (known after apply)
+      + resource_group_name             = "rg-opella-dev-eastus"
+      + size                            = "Standard_B1s"
+      + tags                            = {
+          + "Environment" = "dev"
+          + "ManagedBy"   = "terraform"
+          + "Project"     = "opella"
+          + "Region"      = "eastus"
+        }
+
+      + admin_ssh_key {
+          + public_key = (sensitive value)
+          + username   = "azureadmin"
+        }
+
+      + os_disk {
+          + caching              = "ReadWrite"
+          + name                 = "osdisk-vm-opella-dev-eastus"
+          + storage_account_type = "Standard_LRS"
+        }
+
+      + source_image_reference {
+          + offer     = "0001-com-ubuntu-server-jammy"
+          + publisher = "Canonical"
+          + sku       = "22_04-lts-gen2"
+          + version   = "latest"
+        }
+    }
+
+Plan: 15 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  + resource_group_id   = (known after apply)
+  + resource_group_name = "rg-opella-dev-eastus"
+  + storage_account_id  = (known after apply)
+  + storage_account_name = "stopelladeveastus"
+  + subnet_ids          = (known after apply)
+  + vm_name             = "vm-opella-dev-eastus"
+  + vm_private_ip       = (known after apply)
+  + vm_public_ip        = (known after apply)
+  + vnet_id             = (known after apply)
+  + vnet_name           = "vnet-opella-dev-eastus"
